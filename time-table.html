@@ -309,6 +309,14 @@
                 return this;
             },
 
+            val: function(v)
+            {
+               if (v == undefined || v == '')
+               {
+                   return this.currentElement.value;
+               }
+                this.currentElement.value = v;
+            },
             ce: function (t) {
                 _DomAssitant.currentElement = document.createElement(t);
                 return this;
@@ -418,6 +426,15 @@
             var date = new Date();
             date.setDate(date.getDate() - 1);
             return formatDate(date);
+        };
+        DA.getObject = function(d)
+        {
+             d = d.split('.');
+            return {
+                d: d[0],
+                m: --d[1],
+                y: d[2]
+            }
         };
 
         DA.getDayName = function(num)
@@ -540,10 +557,6 @@
         DA.getMonthDays = function(year, month)
         {
             var today = new Date();
-            if (today.getMonth() == month && year == today.getFullYear())
-            {
-                return DA.getCurrentMonthDays();
-            }
             var firstDay = new Date(year, month, 1);
             if (month == 11)
             {
@@ -878,11 +891,169 @@
             var elem = da.ac(type, content);
             return new DomAssitant().init(elem);
         }
+        var table = new DomAssitant();
+        table.gi('table');
+        var build = new DomAssitant();
+        function getDays(ds, de)
+        {
+            var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+            var secondDate = new Date(ds.y, ds.m, ds.d);
+            var firstDate = new Date(de.y, de.m, de.d);
+
+            return Math.round((firstDate.getTime() - secondDate.getTime())/(oneDay));
+        }
+        build.gi('build').on('click', function()
+        {
+            var data_start = new DomAssitant();
+            data_start.gi('data_start');
+            var data_end = new DomAssitant();
+            data_end.gi('data_end');
+            var ds = data_start.val(), de = data_end.val();
+            if (ds == '' || de == '')
+            {
+                return false;
+            }
+            ds = dateAssitant.getObject(ds);
+            de = dateAssitant.getObject(de);
+            var len = (de.y - ds.y);
+            len = len > 1 ? (len - 1) * 12 : 0;
+            len = len + Math.abs(de.y - ds.y == 0 ? de.m - ds.m + 1 : (de.m + 13 - ds.m));
+            table.racfn();
+            var days = dateAssitant.getDays();
+            var m = ds.m, y = ds.y;
+            for (var i = 0; i < len; i++)
+            {
+                var $c = initElem(table, 'table').addClass('container-table');
+                var $t = initElem($c, 'table').addClass('month-table');
+                var $tr = initElem($t, 'tr');
+                var $td = initElem($tr, 'td',  dateAssitant.getMonthName(m) + ' ' + y).attr('colspan', '7');
+                $tr = initElem($t, 'tr');
+                for (var j = 0, dlen = days.length; j < dlen; j++)
+                {
+                     $td = initElem($tr, 'td', days[j]);
+                }
+
+                var month = dateAssitant.getMonth(y, m),
+                        week = null,
+                        first__line = false,
+                        mlen = month.length,
+                        ml = 1;
+                do {
+                    if (week == null || month[ml] == 0) {
+                        if (week == null) {
+                            first__line = true;
+                        }
+                        week = initElem($t, 'tr');
+                        if (first__line) {
+                            first__line = false;
+                            for (j = 0; j < month[ml]; j++) {
+                                initElem(week, 'td'); // add empty cells for 1st week in month
+                            }
+                        }
+                    }
+                    var day = initElem(week, 'td', ml);
+                    var count = getDays({
+                        y:2015, m:8, d: 27
+                    },{
+                        m: m, y: y, d: ml
+                    });
+                    if (count > 0)
+                    {
+                        if (count % 4 == 0 || (count - 1) % 4 == 0)
+                        {
+                            day.addClass('-work');
+                        }
+                    }
+                    else
+                    {
+
+                        if (count % 4 == 0 || (count - 1) % 4 == 0)
+                        {
+                            day.addClass('-work');
+                        }
+                    }
+
+                    ml++;
+                } while (ml < mlen);
+                m = m == 11 ? 0 : m + 1;
+                y = m == 0 ? +y + 1 : y;
+            }
+
+        })
     };
 </script>
+<script>
+
+</script>
+<style>
+    button#build
+    {
+        margin-top:5px ;
+        outline: 0;
+        padding: 5px 15px;
+        background: #fff;
+        color: #363636;
+        font-size: 20px;
+        cursor: pointer;
+        border: 1px solid #d0d0d0;
+        display: block;
+        height: auto;
+        line-height: normal;
+        box-shadow: 0 0 2px #d6d6d6;
+
+    }
+    button#build:active
+    {
+        box-shadow: none;
+    }
+    div#table
+    {
+        width: 100%;
+    }
+    .container-table
+    {
+        height: 265px;
+        margin: 20px 0 0 20px;
+        float: left;
+    }
+    table.month-table
+    {
+        width: 400px;
+        text-align: center;
+        border-collapse: collapse;
+        border-top: 1px solid #363636;
+    }
+    table.month-table tr
+    {
+        height: 30px;
+    }
+    table.month-table td
+    {
+        border: 1px solid #363636;
+    }
+    table.month-table td.-work
+    {
+        color: #ffffff;
+        background-color: rgb(0, 176, 80);
+    }
+    table.month-table tr:first-child
+    {
+        font-size: 20px;
+        height: 40px;
+    }
+    table.month-table tr:nth-child(2) td:nth-child(6),
+    table.month-table tr:nth-child(2) td:nth-child(7)
+    {
+        color: #ff0000;
+    }
+
+</style>
 <body>
 
-<datepicker-interval id="second"></datepicker-interval>
+<datepicker-interval id="data"></datepicker-interval>
+<button id="build">Построить расписание</button>
+<div id="table">
 
+</div>
 </body>
 </html>
