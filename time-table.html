@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Расписание</title>
+    <style>
+
+        html,
+        body
+        {
+
+            font-family: Arial;
+        }
+        .di-panel
+        {
+            /*display: none;*/
+            position: absolute;
+            width: 546px;
+            height: 203px;
+            background-color: #ffffff;
+            z-index: 50000;
+            top: 32px;
+            left: -1px;
+            border: 1px solid #d1d1d1;
+            padding: 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 5px 34px -12px #668aa9;
+        }
+        .di-picker
+        {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            height: 29px;
+            width: 204px;
+            position: relative;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            padding: 0;
+        }
+        .di-icon
+        {
+            height: 100%;
+            width: 30px;
+            border-right: 1px solid #d1d1d1;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+            float: left;
+        }
+        .di-icon__datepicker
+        {
+
+            background: rgba(243, 243, 243, 1)  no-repeat center;
+            opacity: 0.5;
+            height: 100%;
+            width: 100%;
+            border-top-left-radius: 3px;
+            border-bottom-left-radius: 3px;
+        }
+        .di-icon__datepicker:hover,
+        .di-icon__datepicker.-active
+        {
+            cursor: pointer;
+            opacity: 1;
+        }
+        .di-triangle
+        {
+            background: rgba(0, 0, 0, 0)  no-repeat center;
+            height: 8px;
+            width: 16px;
+            position: absolute;
+            top: -8px;
+            left: 106px;
+        }
+        input.di-picker__value
+        {
+            width: 80px;
+            height: 100%;
+            padding: 0!important;
+            margin: 0;
+            text-align: center;
+            line-height: 29px;
+            border: 0;
+            outline: 0;
+            outline-offset:0;
+            float: left;
+        }
+        .di-dash
+        {
+            float: left;
+            line-height: 29px;
+            width: 10px;
+            text-align: center;
+        }
+        .diP-functions
+        {
+            height: 100%;
+            width: 135px;
+            float: left;
+            padding: 40px 0 0 20px;
+
+            border-right: 1px solid #f5f5f5;
+        }
+        .diP-functions__action
+        {
+            height: 25px;
+            line-height: 25px;
+            font-size: 12px;
+        }
+        .diP-functions__action:hover
+        {
+            color: #00a2ff;
+            cursor: pointer;
+        }
+        .diP-header
+        {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+        }
+        .diP-header__name
+        {
+            font-size: 16px;
+            width:  167px;
+            height: 100%;
+            text-align: center;
+            display: inline-block;
+            padding-top: 1px;
+        }
+        .diP-header__text
+        {
+            font-size: 16px;
+            height: 100%;
+            text-align: center;
+            margin: 0 auto;
+        }
+        .diP-header__text:not(.-allow)
+        {
+            opacity: 0.5;
+        }
+        .diP-header__text.-allow:hover
+        {
+            cursor: pointer;
+            color: #00a2ff;
+        }
+        .diP-header__name.-previousMonth
+        {
+            padding-right: 39px;
+        }
+        .diP-header__name.-currentMonth
+        {
+            padding-left: 39px;
+        }
+        .diP-header__prev
+        {
+            height: 100%;
+            width: 37px;
+            display: inline-block;
+            font-size: 25px;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .diP-header__next
+        {
+            height: 100%;
+            width: 37px;
+            display: inline-block;
+            font-size: 25px;
+            text-align: left;
+            padding-left: 10px;
+
+        }
+        .diP-header__prev:hover,
+        .diP-header__next:hover
+        {
+            cursor: pointer;
+        }
+        .diP-header__text
+        {
+            font-size: 16px;
+            height: 100%;
+            text-align: center;
+            margin: 0 auto;
+        }
+        .diP-header__text:not(.-allow)
+        {
+            opacity: 0.5;
+        }
+        .diP-header__text.-allow:hover
+        {
+            cursor: pointer;
+            color: #00a2ff;
+        }
+
+        .di-panel__separator
+        {
+            width: 1px;
+            height: 135px;
+            background-color: #f5f5f5;
+            float: left;
+            margin-top: 6px;
+        }
+        .di-panel__data
+        {
+            width: 204px;
+            height: auto;
+            font-size: 12px;
+            float: left;
+        }
+        .di-panel__data .di-picker__week:first-child
+        {
+            font-size: 10px;
+        }
+
+        .di-picker__week
+        {
+            width: 161px;
+            height: 23px;
+            margin: 0 auto;
+        }
+        .di-picker__week div.di-picker__day:nth-child(6),
+        .di-picker__week div.di-picker__day:nth-child(7),
+        .di-picker__week div.di-picker__day_name:nth-child(6),
+        .di-picker__week div.di-picker__day_name:nth-child(7){
+            color: #ff0000;
+        }
+        .di-picker__week.-notallow .di-picker__day_name {
+            opacity: 0.5;
+        }
+        .di-picker__day,
+        .di-picker__day_name
+        {
+            width: 23px;
+            height: 23px;
+            line-height: 27px;
+            text-align: center;    float: left;
+        }
+        .di-picker__day:not(.-empty):not(.-future):not(.-block):hover
+        {
+            line-height: 25px;
+            border: 1px dotted #d1d1d1;
+            cursor: pointer;
+        }
+        .di-picker__day.-future,
+        .di-picker__day.-block
+        {
+            opacity: 0.5;
+        }
+        .di-picker__day.-selected
+        {
+            background-color: #fee991;
+        }
+        .di-picker__day.-interval
+        {
+            background-color: #f5f5f5;
+        }
+        .di-picker__day.-today
+        {
+            position: relative;
+        }
+        .di-picker__day.-today:after
+        {
+            content: '';
+            background-color: #f69415;
+            width: 15px;
+            height: 3px;
+            position: absolute;
+            bottom: 1px;
+            left: 4px;
+        }
+        .di-picker__day.-today:hover:after
+        {
+            bottom: 0;
+            left: 3px;
+        }
+        /**/
+        .dspl-none
+        {
+            display: none;
+        }
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+    </style>
+</head>
+<script>
+    /*created by Ivan Kamenkov and Kirill Matrosov*/
+    function DomAssitant (){
+
+        function _DomAssitant(  ) {
+            return this;
+        }
+        _DomAssitant =
+        {
+            currentElement: null,
+            child: [],
+            constructor: _DomAssitant,
+            init: function(elem)
+            {
+                _DomAssitant.currentElement = elem;
+                return this;
+            },
+            gi: function (id) {
+                _DomAssitant.currentElement = document.getElementById(id);
+                return this;
+            },
+
+            ce: function (t) {
+                _DomAssitant.currentElement = document.createElement(t);
+                return this;
+            },
+            getCE: function()
+            {
+                return this.currentElement;
+            },
+            ct: function (t) {
+                _DomAssitant.currentElement = document.createTextNode(t);
+                return this;
+            },
+            gt: function (element, t) {
+                element = element || document;
+                return element.getElementsByTagName(t);
+            },
+            ac: function (child, content) { //appendChildToNode
+
+                child = document.createElement(child);
+                if (content)
+                    child.innerHTML = content;
+                this.currentElement.appendChild(child);
+                return child;
+            },
+            racfn: function () { //removeAllChildrenFromNode
+
+                while (this.currentElement.firstChild) {
+                    this.currentElement.removeChild(this.currentElement.firstChild);
+                }
+            },
+            children: function () {
+
+                var elem = this.currentElement.childNodes[0];
+            },
+            insertAfter: function (element) {
+                this.currentElement.parentNode.insertBefore(element, this.nextSibling);
+                return this;
+            },
+            getDocumentElementsWithAttribute: function (attributeName) {
+                var attributeValue = arguments.length <= 1 || arguments[1] === undefined ? "" : arguments[1];
+                var element = arguments.length <= 2 || arguments[2] === undefined ? this.currentElement : arguments[2];
+                return element.querySelectorAll("[" + attributeName + "=\"" + attributeValue + "\"]");
+            },
+            addClass: function (className) {
+                this.currentElement.classList.add(className);
+                return this;
+            },
+            hasClass: function (className) {
+                return (" " + this.currentElement.className + " ").replace(/[\n\t]/g, " ").indexOf(" " + className + " ") > -1;
+            },
+            removeClass: function (className) {
+                this.currentElement.classList.remove(className);
+                return this;
+            },
+            attr: function (attributeName, attributeContent) {
+                this.currentElement.setAttribute(attributeName, attributeContent);
+                return this;
+            },
+            replace: function (targetElement) {
+                targetElement.parentNode.replaceChild(this.currentElement, targetElement);
+                return this;
+            },
+            on: function (eventType, eventFunction) {
+                this.currentElement["on" + eventType] = eventFunction;
+                return this;
+            },
+            off: function (eventType) {
+
+                this.currentElement["on" + eventType] = null;
+                return this;
+            },
+            css: function (rule, value) {
+                this.currentElement.style[rule] = "" + value;
+                return this;
+            },
+            text: function(text)
+            {
+                if (text)
+                    this.currentElement.innerHTML = text;
+                return this;
+            }
+        };
+        return _DomAssitant;
+    }
+</script>
+<script>
+    var dateAssitant = (function()
+    {
+        var months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        var days = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+
+        function formatDate (d)  // функция по формированию вида даты дд.мм.гг
+        {
+            d = [d.getDate(), d.getMonth() + 1, d.getFullYear()];
+            return d.join('.').replace(/\b(\d)\b/g, '0$1');
+        }
+        function correctDay(d)
+        {
+            return (d == 0) ? 6 : d - 1;
+        }
+        function DA()
+        {
+            return DA;
+        }
+        DA.getPreviousDay = function()
+        {
+            var date = new Date();
+            date.setDate(date.getDate() - 1);
+            return formatDate(date);
+        };
+
+        DA.getDayName = function(num)
+        {
+            var temp = num;
+            while(num >= 10)
+            {
+                num = num % 10;
+            }
+            while(temp >= 100)
+            {
+                temp = temp % 10;
+            }
+            if (num > 0 && num < 5)
+            {
+                if (temp > 10 && temp < 15)
+                {
+                    return 'дней';
+                }
+                if (num == 1) return 'день';
+                return 'дня';
+            }
+            return 'дней';
+        };
+
+        DA.getDay = function(num)
+        {
+            return days[num];
+        };
+
+        DA.getDays = function()
+        {
+            return days;
+        };
+
+        DA.getMonth = function(year, month)
+        {
+            var _date = new Date(year, month, 1);
+            var _month = [];
+            while (_date.getMonth() == month)
+            {
+                var day = _date.getDate();
+                _month[day] = correctDay(_date.getDay());
+                _date.setDate(day + 1);
+            }
+            return _month;
+        };
+        DA.getMonthName = function(month)
+        {
+            return months[month];
+        };
+
+        DA.getCurrentMonth = function()
+        {
+            var today = new Date();
+            return DA.getMonth(today.getFullYear(), today.getMonth());
+        };
+        DA.getFormatedDate = function(y, m, d)
+        {
+            return formatDate(new Date(y, m, d));
+        };
+
+        DA.checkWithAfterToday = function (year, month, day)
+        {
+            var today = new Date();
+            var _y = today.getFullYear(), _m = today.getMonth(), _d = today.getDate();
+            if (_y < year)
+                return true;
+            if (_m < month && _y == year)
+                return true;
+            if (_d < day && _m == month && _y == year)
+                return true;
+            return false;
+        };
+        DA.compareDates = function (date_less, date_more)
+        {
+            if (date_less.y < date_more.y)
+                return true;
+            if (date_less.m < date_more.m && date_less.y == date_more.y)
+                return true;
+            if (date_less.d < date_more.d && date_less.m == date_more.m && date_less.y == date_more.y)
+                return true;
+            return false;
+        };
+        DA.getPreviousMonthDays = function() //returnFirstAndLastDays
+        {
+            var last = new Date(); // сегодня
+            last.setDate(1); // первое число
+            last.setHours(-1);
+            var first = new Date(last.getFullYear(), last.getMonth(), 1);
+            return {first:first, last:last};
+        };
+        DA.getCurrentMonthDays = function() //returnFirstAndLastDays
+        {
+            var lastDay = new Date();
+            return this.getMonthDays(lastDay.getFullYear(), lastDay.getMonth());
+        };
+        DA.getPreviousWeekDays = function() //
+        {
+            var before_week = new Date(new Date().getTime() - 60 * 60 * 24 * 7 * 1000) // 60 * 60 * 24 * 7 * 1000 - время недели в миллисекундах
+                    , day = before_week.getDay()
+                    , diff_to_Monday = before_week.getDate() - day + (day === 0 ? -6 : 1)
+                    , last_monday = new Date(before_week.setDate(diff_to_Monday))
+                    , last_sunday = new Date(before_week.setDate(diff_to_Monday + 6));
+            return {first:last_monday, last:last_sunday};
+        };
+        DA.getCurrentWeekDays = function()
+        {
+            var curr = new Date();
+            var y = curr.getFullYear();
+            var m = curr.getMonth();
+            var first = curr.getDate() - curr.getDay() + 1;
+            var last = first + curr.getDay() - 1;
+
+            var firstday = new Date(y, m, first);
+            var lastday = new Date(y, m, last);
+            return {first:firstday, last: lastday};
+        };
+
+        DA.getMonthDays = function(year, month)
+        {
+            var today = new Date();
+            if (today.getMonth() == month && year == today.getFullYear())
+            {
+                return DA.getCurrentMonthDays();
+            }
+            var firstDay = new Date(year, month, 1);
+            if (month == 11)
+            {
+                month = 0;
+                year = year + 1;
+            }
+            else
+            {
+                month ++;
+            }
+            var lastDay = new Date(year, month, 0);
+            return {first:firstDay, last: lastDay};
+
+        };
+        DA.getYesterdayDays = function()
+        {
+            var date = new Date();
+            date.setDate(date.getDate() - 1);
+            return {first:date, last:date};
+        };
+
+        return DA;
+    })();
+
+</script>
+<script>
+    window.onload = function () {
+
+        var Pickers = new DomAssitant().gt(null, "datepicker-interval");
+        var datePickers = [];
+        for (var i = 0, len = Pickers.length; i < len; i++) {
+            (function() {
+                var da = new DomAssitant();
+                var new_datepicker = da.ce('div').addClass('di-picker');
+                new_datepicker
+                        .on('click', function (e) {
+                            if (d_input_start.currentElement.index == 1)
+                            {
+                                d_input_end.currentElement.focus();
+                            }
+                            else
+                            {
+                                d_input_start.currentElement.focus();
+                            }
+                        })
+                        .on('mouseenter', function (e) {
+                            d_input_start.on('blur', function () {
+                            });
+                            d_input_end.on('blur', function () {
+                            });
+
+                        })
+                        .on('mouseleave', function (e) {
+                            d_input_start.on('blur', function () {
+                                d_panel.addClass('dspl-none');
+                                di_icon__dp.removeClass('-active');
+                            });
+                            d_input_end.on('blur', function () {
+                                d_panel.addClass('dspl-none');
+                                di_icon__dp.removeClass('-active');
+                            });
+                        });
+
+                var di_icon = initElem(new_datepicker, 'div').addClass('di-icon');
+                var di_icon__dp = initElem(di_icon, 'div').addClass('di-icon__datepicker').on('click', function()
+                {
+                    d_panel.currentElement.classList.toggle('dspl-none');
+                    this.classList.toggle('-active');
+                    d_input_start.currentElement.index = 0;
+                    showMonth();
+                });
+                var d_input_start = initElem(new_datepicker, 'input').addClass('di-picker__value').attr("id", Pickers[0].getAttribute("id")+'_start')
+                        .attr('type', 'text').attr('placeholder', 'дд.мм.гггг')
+                        .attr('readonly', 'readonly')
+                        .on('blur', function (e) {
+                        })
+                        .on('click', function (e) {
+                            d_panel.removeClass('dspl-none');
+                            di_icon__dp.addClass('-active');
+                            d_input_start.currentElement.index = 0;
+                            showMonth();
+                        });
+                var d_dash = initElem(new_datepicker, 'div', '\u2014').addClass('di-dash');
+                var d_input_end = initElem(new_datepicker, 'input').addClass('di-picker__value').attr("id", Pickers[0].getAttribute("id")+'_end')
+                        .attr('type', 'text').attr('placeholder', 'дд.мм.гггг')
+                        .attr('readonly', 'readonly')
+                        .on('blur', function (e) {
+                            //d_panel.addClass('dspl-none');
+
+                        })
+                        .on('click', function (e) {
+                            d_panel.removeClass('dspl-none');
+                            di_icon__dp.addClass('-active');
+                            d_input_start.currentElement.index = 1;
+                            showMonth();
+                        });
+                var d_panel = initElem(new_datepicker, 'div').addClass('di-panel').addClass('dspl-none').attr('panel', '').on('click', function()
+                {
+
+                });
+
+                initElem(d_panel, 'div').addClass('di-triangle');
+                var p_functions = initElem(d_panel, 'div').addClass('diP-functions');
+
+                function setDateForInput(input, date)
+                {
+                    input.currentElement.date =
+                    {
+                        y: date.getFullYear(),
+                        m: date.getMonth(),
+                        d: date.getDate()
+                    };
+                    input.currentElement.value = dateAssitant.getFormatedDate(input.currentElement.date.y, input.currentElement.date.m, input.currentElement.date.d);
+                }
+                function callSetDateForInput(month__days)
+                {
+                    setDateForInput(d_input_start, month__days.first);
+                    setDateForInput(d_input_end, month__days.last);
+                    d_panel.addClass('dspl-none');
+                    di_icon__dp.removeClass('-active');
+                }
+                var p_functions__previous_month = initElem(p_functions, 'div', 'Прошлый месяц').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getPreviousMonthDays());
+                });
+                var p_functions__current_month = initElem(p_functions, 'div', 'Этот месяц').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getCurrentMonthDays());
+                });
+                var p_functions__previous_week = initElem(p_functions, 'div', 'Прошлая неделя').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getPreviousWeekDays());
+                });
+                var p_functions__current_week = initElem(p_functions, 'div', 'Эта неделя').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getCurrentWeekDays());
+                });
+                var p_functions__yesterday = initElem(p_functions, 'div', 'Вчера').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getYesterdayDays());
+                });
+                var p_header = initElem(d_panel, 'div').addClass('diP-header').attr('panel', '');
+                var p_header__prev = initElem(p_header, 'div', '&#8249;').addClass('diP-header__prev').on('click', function()
+                {
+                    var self = d_input_end.getCE();
+                    var temp_year = self.y, temp_month = self.m;
+                    temp_year = (temp_month < 2) ? (--temp_year) : temp_year;
+                    temp_month = (temp_month < 2) ? 11 : (temp_month - 2);
+                    showMonth([temp_year, temp_month]);
+                });
+                var p_header__name = [
+                    initElem(p_header, 'div').addClass('diP-header__name').addClass('-previousMonth'),
+                    initElem(p_header, 'div').addClass('diP-header__name').addClass('-currentMonth')
+                ];
+                var p_header__next = initElem(p_header, 'div', '&#8250;').addClass('diP-header__next').on('click', function()
+                {
+                    var self = d_input_end.getCE();
+                    var temp_year = self.y, temp_month = self.m;
+                    temp_year = (temp_month > 9) ? (++temp_year) : temp_year;
+                    temp_month = (temp_month > 9) ? 0 : (temp_month + 2);
+                    showMonth([temp_year, temp_month]);
+                });
+
+                function showMonth(dt) // dt = [year, month]
+                {
+                    var di_start = d_input_start.getCE();
+                    var di_end   = d_input_end.getCE();
+
+                    var dt__check = dt == null || dt == undefined || dt.length == 0;
+                    if (!d_panel.hasClass('dspl-none') || !dt__check) {
+
+
+                        var parentNode = di_start.parentNode;
+                        var data = d_input_start.getDocumentElementsWithAttribute('data', '', parentNode)[0];
+                        var y, m, d;
+                        var today = new Date(),
+                                ty = today.getFullYear(),
+                                tm = today.getMonth(),
+                                td = today.getDate();
+                        var checkInputDate = function(date)
+                        {
+                            date.value = dateAssitant.getFormatedDate(date.date.y, date.date.m, date.date.d);
+                            return date;
+                        };
+                        var getSelectedDates = function(inputs)
+                        {
+                            var m = inputs.m, y = inputs.y;
+                            return [
+                                (di_start.date    != undefined && y == di_start.date.y    && m == di_start.date.m)    ? +di_start.date.d   : 0,
+                                (di_end.date      != undefined && y == di_end.date.y      && m == di_end.date.m)      ? +di_end.date.d     : 0];
+                        };
+                        if (dt__check) {
+                            if (di_start.value == '' && di_end.value == '') {
+                                y = ty;
+                                m = tm;
+                            }
+                            else {
+                                di_start    = checkInputDate(di_start);
+                                di_end      = checkInputDate(di_end);
+                                y = di_end.date.y;
+                                m = di_end.date.m;
+                            }
+                        }
+                        else
+                        {
+                            y = dt[0];
+                            m = dt[1];
+                        }
+                        var inputs = [di_start, di_end], input__index = (di_start.index == undefined) ? 0 : +di_start.index;
+                        inputs[1].y = y;
+                        inputs[1].m = m;
+                        inputs[0].y = m > 0 ? y : y - 1;
+                        inputs[0].m = m > 0 ? m - 1: 11 ;
+
+                        var days = dateAssitant.getDays();
+
+                        for (var input_i = 0; input_i < 2; input_i++) // go throw inputs
+                        {
+                            (function(input_i) {
+                                p_data[input_i].racfn(); // clear filed for days
+                                p_header__name[input_i].racfn(); // clear filed for header
+                                var curr_day = (inputs[input_i].y == ty && inputs[input_i].m == tm) ? td : 0;
+                                var selected = getSelectedDates(inputs[input_i]);
+                                var month = dateAssitant.getMonth(inputs[input_i].y, inputs[input_i].m);
+                                var ph__name = initElem(p_header__name[input_i], 'span', dateAssitant.getMonthName(inputs[input_i].m) + ' ' + inputs[input_i].y).addClass('diP-header__text');
+                                var week = initElem(p_data[input_i], 'div').addClass('di-picker__week');
+
+                                ph__name.on('click', function() {
+                                    callSetDateForInput(dateAssitant.getMonthDays(inputs[input_i].y, inputs[input_i].m));
+                                }).addClass('-allow');
+                                var i = 0, len = days.length;
+                                do {
+                                    initElem(week, 'div', days[i++]).addClass('di-picker__day_name'); // week days
+                                } while (i < len);
+                                i = 1;
+                                len = month.length;
+                                week = null;
+                                var first__line = false;
+                                do {
+                                    if (week == null || month[i] == 0) {
+                                        if (week == null) {
+                                            first__line = true;
+                                        }
+                                        week = initElem(p_data[input_i], 'div').addClass('di-picker__week');
+                                        if (first__line) {
+                                            first__line = false;
+                                            for (var j = 0; j < month[i]; j++) {
+                                                initElem(week, 'div').addClass('di-picker__day_name').addClass('-empty'); // add empty cells for 1st week in month
+                                            }
+                                        }
+                                    }
+                                    var day = initElem(week, 'div', i).addClass('di-picker__day').on('click', function () { // init day
+
+                                        if (this.classList.contains('-future')) return false;
+                                        if (this.classList.contains('-block')) return false;
+                                        var input = inputs[input__index]; // current input to get value
+
+                                        input.d = this.innerText || this.innerHTML; // cross  brower
+                                        input.value = dateAssitant.getFormatedDate(inputs[input_i].y, inputs[input_i].m, input.d); // set value
+                                        input.date = {
+                                            y: inputs[input_i].y,
+                                            m: inputs[input_i].m,
+                                            d: +input.d
+                                        };
+                                        if (input__index == 0 || inputs[input__index].value == '') { // if second input is empty
+                                            inputs[input__index].value = input.value;
+                                            inputs[input__index].date = input.date;
+                                        }
+                                        input__index = (input__index + 1) % 2;
+                                        if (inputs[1].value != '' && inputs[0].value != '') {
+                                            if (dateAssitant.compareDates(inputs[1].date, inputs[0].date)) { // if second input is less than first
+                                                inputs[1].value = inputs[0].value;
+                                                inputs[1].date = inputs[0].date;
+                                            }
+                                        }
+                                        di_start.index = input__index; // remember the next input to change value
+                                        showMonth([inputs[1].y, inputs[1].m]); // redraw
+                                    });
+                                    if (curr_day == i) {
+                                        day.addClass('-today');
+                                    }
+                                    if (input__index == 1)
+                                    {
+                                        var t_date ={
+                                            d: i,
+                                            m: inputs[input_i].m,
+                                            y: inputs[input_i].y
+                                        };
+
+
+                                        if (dateAssitant.compareDates(t_date, inputs[0].date)) {
+                                            day.addClass('-block');
+                                        }
+                                    }
+                                    if (~selected.indexOf(i)) {
+                                        day.addClass('-selected');
+                                    }
+                                    var this_day =
+                                    {
+                                        d: i,
+                                        m: inputs[input_i].m,
+                                        y: inputs[input_i].y
+                                    };
+
+                                    if (inputs[0].date != undefined && inputs[1].date != undefined) {
+                                        if (dateAssitant.compareDates(inputs[0].date, this_day) && dateAssitant.compareDates(this_day, inputs[1].date)) {
+                                            day.addClass('-interval');
+                                        }
+                                    }
+                                    /*if (dateAssitant.checkWithAfterToday(inputs[input_i].y, inputs[input_i].m, i)) {
+                                        day.addClass('-future');
+                                    }*/
+                                    i++;
+                                } while (i < len);
+                            })(input_i);
+                        }
+                    }
+                }
+
+                var p_data = [];
+                p_data.push(initElem(d_panel, 'div').addClass('di-panel__data').attr('data', ''));
+                initElem(d_panel, 'div').addClass('di-panel__separator');
+                p_data.push(initElem(d_panel, 'div').addClass('di-panel__data').attr('data', ''));
+
+
+                new_datepicker.replace(Pickers[0]);
+                datePickers.push(new_datepicker.getCE());
+            })();
+        }
+        function initElem(da, type, content)
+        {
+            var elem = da.ac(type, content);
+            return new DomAssitant().init(elem);
+        }
+    };
+</script>
+<body>
+
+<datepicker-interval id="second"></datepicker-interval>
+
+</body>
+</html>
