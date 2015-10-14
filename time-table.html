@@ -973,6 +973,51 @@
         });
 
         build.gi('build').on('click', buildTT);
+        function countDays(days)
+        {
+            var ds = {
+                d: days.first.getDate(),
+                m: days.first.getMonth(),
+                y: days.first.getFullYear()
+            };
+            var de = {
+                d: days.last.getDate(),
+                m: days.last.getMonth(),
+                y: days.last.getFullYear()
+            };
+            var ds_s = 0;
+            var len = (de.y - ds.y);
+            len = len > 1 ? (len - 1) * 12 : 0;
+            len = len + Math.abs(de.y - ds.y == 0 ? de.m - ds.m + 1 : (de.m + 13 - ds.m));
+            var m = ds.m, y = ds.y;
+            for (var i = 0; i < len; i++) {
+
+                var month = dateAssitant.getMonth(y, m),
+                        mlen = month.length,
+                        ml = 1;
+                do {
+                    var d = {
+                        m: m, y: y, d: ml
+                    };
+
+                    var count = getDays(d,
+                            {
+                                y: 2015, m: 8, d: 27
+                            });
+                    if (dateAssitant.compareDates2(ds, d) && dateAssitant.compareDates2(d, de)) {
+
+                        if (count % 4 == 0 || (count - 1) % 4 == 0) {
+                            ds_s++;
+                        }
+
+                    }
+                    ml++;
+                } while (ml < mlen);
+                m = m == 11 ? 0 : m + 1;
+                y = m == 0 ? +y + 1 : y;
+            }
+            return ds_s;
+        }
         function buildTT () {
             var data_start = new DomAssitant();
             data_start.gi('data_start');
@@ -1043,18 +1088,9 @@
                             }
                         }
                         if (!check) {
-                            if (count > 0) {
-                                if (count % 4 == 0 || (count - 1) % 4 == 0) {
-                                    day.addClass('-work');
-                                    ds_s++;
-                                }
-                            }
-                            else {
-
-                                if (count % 4 == 0 || (count - 1) % 4 == 0) {
-                                    day.addClass('-work');
-                                    ds_s++;
-                                }
+                            if (count % 4 == 0 || (count - 1) % 4 == 0) {
+                                day.addClass('-work');
+                                ds_s++;
                             }
                         }
                         else {
@@ -1065,8 +1101,11 @@
                             if (month[ml] == 5)
                             {
                                 var wdays = dateAssitant.getThisWeekDays(d);
-                                day.addClass('-work');
-                                ds_s++;
+                                if (countDays(wdays) == 4)
+                                {
+                                    day.addClass('-work');
+                                    ds_s++;
+                                }
                             }
 
                         }
@@ -1094,7 +1133,7 @@
 
     button#build
     {
-        margin-top:5px ;
+        margin-top:25px ;
         outline: 0;
         padding: 5px 15px;
         background: #fff;
@@ -1163,14 +1202,16 @@
 
 </style>
 <body>
-
-<datepicker-interval id="data"></datepicker-interval>
+<div>
+    <p>Выберете интервал дат</p>
+    <datepicker-interval id="data"></datepicker-interval>
+</div>
 <button id="build">Построить расписание</button>
 <div class="dspl-none" id="stats">
     <p>Период <span id="ds"></span> — <span id="de"></span>. Всего смен: <span id="total_s"></span></p>
     <p><span style="color: #ffffff; background-color: rgb(0, 176, 80);width: 65px; text-align: center; padding: 3px 0;display: inline-block;">Дарья</span> — <span id="ds_"></span> см.</p>
     <p><span style="width: 65px;display: inline-block;text-align: center">Галина</span> — <span id="de_"></span> см.</p>
-    <p><span style="color: #00a2ff; cursor: pointer" id="cources">Без учета курсов</span></p>
+    <p><span style="color: #00a2ff; cursor: pointer" id="cources">С учетом курсов</span></p>
 </div>
 <div id="table">
 
