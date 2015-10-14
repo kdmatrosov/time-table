@@ -8,7 +8,7 @@
         html,
         body
         {
-
+            padding: 20px;
             font-family: Arial;
         }
         .di-panel
@@ -916,7 +916,21 @@
 
             return Math.round((firstDate.getTime() - secondDate.getTime())/(oneDay));
         }
-        build.gi('build').on('click', function()
+        var cources = [
+            [{d: 21, m: 8, y: 2015}, {d: 23, m: 9, y: 2015}],
+            [{d: 9, m: 10, y: 2015}, {d: 11, m: 11, y: 2015}]
+        ];
+        var cource = false;
+        var cources_ = new DomAssitant();
+        cources_.gi('cources').on('click', function()
+        {
+            cource = !cource;
+            cources_.text(!cource ? 'С учетом курсов' : 'Без учета курсов');
+            buildTT();
+        });
+
+        build.gi('build').on('click', buildTT);
+        function buildTT ()
         {
             var data_start = new DomAssitant();
             data_start.gi('data_start');
@@ -949,7 +963,7 @@
                 $tr = initElem($t, 'tr');
                 for (var j = 0, dlen = days.length; j < dlen; j++)
                 {
-                     $td = initElem($tr, 'td', days[j]);
+                    $td = initElem($tr, 'td', days[j]);
                 }
 
                 var month = dateAssitant.getMonth(y, m),
@@ -976,7 +990,7 @@
                     var day = initElem(week, 'td', ml);
                     var count = getDays(d,
                             { y:2015, m:8, d: 27
-                    });
+                            });
                     if (dateAssitant.compareDates2(ds, d) && dateAssitant.compareDates2(d, de)) {
                         if (count > 0) {
                             if (count % 4 == 0 || (count - 1) % 4 == 0) {
@@ -1005,7 +1019,7 @@
             data_end.gi('ds_').text(ds_s);
             data_end.gi('de_').text(total_s - ds_s);
             data_end.gi('stats').removeClass('dspl-none');
-        })
+        }
     };
 </script>
 <script>
@@ -1040,8 +1054,12 @@
     .container-table
     {
         height: 265px;
-        margin: 20px 0 0 20px;
+        margin: 20px 0 0;
         float: left;
+    }
+    .container-table + .container-table
+    {
+        margin-left: 20px;
     }
     table.month-table
     {
@@ -1087,6 +1105,7 @@
     <p>Период <span id="ds"></span> — <span id="de"></span>. Всего смен <span id="total_s"></span></p>
     <p><span style="color: #ffffff; background-color: rgb(0, 176, 80);width: 65px; text-align: center; padding: 3px 0;display: inline-block;">Дарья</span> — <span id="ds_"></span> см.</p>
     <p><span style="width: 65px;display: inline-block;text-align: center">Галина</span> — <span id="de_"></span> см.</p>
+    <p><span style="color: #00a2ff; cursor: pointer" id="cources">Без учета курсов</span></p>
 </div>
 <div id="table">
 
