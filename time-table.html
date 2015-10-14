@@ -100,7 +100,7 @@
             height: 100%;
             width: 135px;
             float: left;
-            padding: 40px 0 0 20px;
+            padding: 20px 0 0 10px;
 
             border-right: 1px solid #f5f5f5;
         }
@@ -546,6 +546,23 @@
             var lastDay = new Date();
             return this.getMonthDays(lastDay.getFullYear(), lastDay.getMonth());
         };
+        DA.getNextMonthDays = function()
+        {
+
+            var last = new Date(); // сегодня
+            var m = last.getMonth();
+            var y = last.getFullYear();
+            y = m == 11 ? ++y : y;
+            m = m == 11 ? 0 : ++m;
+            y = m == 11 ? ++y : y;
+            m = m == 11 ? 0 :++m;
+            last.setMonth(m);
+            last.setFullYear(y);
+            last.setDate(1); // первое число
+            last.setHours(-1);
+            var first = new Date(last.getFullYear(), last.getMonth(), 1);
+            return {first:first, last:last};
+        };
         DA.getPreviousWeekDays = function() //
         {
             var before_week = new Date(new Date().getTime() - 60 * 60 * 24 * 7 * 1000) // 60 * 60 * 24 * 7 * 1000 - время недели в миллисекундах
@@ -561,11 +578,20 @@
             var y = curr.getFullYear();
             var m = curr.getMonth();
             var first = curr.getDate() - curr.getDay() + 1;
-            var last = first + curr.getDay() - 1;
+            var last = first + 6;
 
             var firstday = new Date(y, m, first);
             var lastday = new Date(y, m, last);
             return {first:firstday, last: lastday};
+        };
+        DA.getNextWeekDays = function()
+        {
+            var next_week = new Date(new Date().getTime() + 60 * 60 * 24 * 7 * 1000) // 60 * 60 * 24 * 7 * 1000 - время недели в миллисекундах
+                    , day = next_week.getDay()
+                    , diff_to_Monday = next_week.getDate() - day + (day === 0 ? -6 : 1)
+                    , last_monday = new Date(next_week.setDate(diff_to_Monday))
+                    , last_sunday = new Date(next_week.setDate(diff_to_Monday + 6));
+            return {first:last_monday, last:last_sunday};
         };
 
         DA.getMonthDays = function(year, month)
@@ -700,6 +726,10 @@
                 {
                     callSetDateForInput(dateAssitant.getCurrentMonthDays());
                 });
+                var p_functions__next_month = initElem(p_functions, 'div', 'Следующий месяц').addClass('diP-functions__action').on('click', function()
+                {
+                    callSetDateForInput(dateAssitant.getNextMonthDays());
+                });
                 var p_functions__previous_week = initElem(p_functions, 'div', 'Прошлая неделя').addClass('diP-functions__action').on('click', function()
                 {
                     callSetDateForInput(dateAssitant.getPreviousWeekDays());
@@ -708,9 +738,9 @@
                 {
                     callSetDateForInput(dateAssitant.getCurrentWeekDays());
                 });
-                var p_functions__yesterday = initElem(p_functions, 'div', 'Вчера').addClass('diP-functions__action').on('click', function()
+                var p_functions__next_week = initElem(p_functions, 'div', 'Следующая неделя').addClass('diP-functions__action').on('click', function()
                 {
-                    callSetDateForInput(dateAssitant.getYesterdayDays());
+                    callSetDateForInput(dateAssitant.getNextWeekDays());
                 });
                 var p_header = initElem(d_panel, 'div').addClass('diP-header').attr('panel', '');
                 var p_header__prev = initElem(p_header, 'div', '&#8249;').addClass('diP-header__prev').on('click', function()
@@ -1102,7 +1132,7 @@
 <datepicker-interval id="data"></datepicker-interval>
 <button id="build">Построить расписание</button>
 <div class="dspl-none" id="stats">
-    <p>Период <span id="ds"></span> — <span id="de"></span>. Всего смен <span id="total_s"></span></p>
+    <p>Период <span id="ds"></span> — <span id="de"></span>. Всего смен: <span id="total_s"></span></p>
     <p><span style="color: #ffffff; background-color: rgb(0, 176, 80);width: 65px; text-align: center; padding: 3px 0;display: inline-block;">Дарья</span> — <span id="ds_"></span> см.</p>
     <p><span style="width: 65px;display: inline-block;text-align: center">Галина</span> — <span id="de_"></span> см.</p>
     <p><span style="color: #00a2ff; cursor: pointer" id="cources">Без учета курсов</span></p>
