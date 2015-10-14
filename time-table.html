@@ -394,7 +394,7 @@
             },
             text: function(text)
             {
-                if (text)
+                if (text != undefined)
                     this.currentElement.innerHTML = text;
                 return this;
             }
@@ -578,6 +578,19 @@
             var y = curr.getFullYear();
             var m = curr.getMonth();
             var first = curr.getDate() - curr.getDay() + 1;
+            var last = first + 6;
+
+            var firstday = new Date(y, m, first);
+            var lastday = new Date(y, m, last);
+            return {first:firstday, last: lastday};
+        };
+        DA.getThisWeekDays = function(d)
+        {
+            var curr = new Date(d.y, d.m, d.d);
+            var y = curr.getFullYear();
+            var m = curr.getMonth();
+            d = curr.getDay() == 0 ? 7 : curr.getDay();
+            var first = curr.getDate() - d + 1;
             var last = first + 6;
 
             var firstday = new Date(y, m, first);
@@ -960,15 +973,13 @@
         });
 
         build.gi('build').on('click', buildTT);
-        function buildTT ()
-        {
+        function buildTT () {
             var data_start = new DomAssitant();
             data_start.gi('data_start');
             var data_end = new DomAssitant();
             data_end.gi('data_end');
             var ds = data_start.val(), de = data_end.val();
-            if (ds == '' || de == '')
-            {
+            if (ds == '' || de == '') {
                 return false;
             }
             data_start.gi('ds').text(ds);
@@ -984,15 +995,13 @@
             table.racfn();
             var days = dateAssitant.getDays();
             var m = ds.m, y = ds.y;
-            for (var i = 0; i < len; i++)
-            {
+            for (var i = 0; i < len; i++) {
                 var $c = initElem(table, 'table').addClass('container-table');
                 var $t = initElem($c, 'table').addClass('month-table');
                 var $tr = initElem($t, 'tr');
-                var $td = initElem($tr, 'td',  dateAssitant.getMonthName(m) + ' ' + y).attr('colspan', '7');
+                var $td = initElem($tr, 'td', dateAssitant.getMonthName(m) + ' ' + y).attr('colspan', '7');
                 $tr = initElem($t, 'tr');
-                for (var j = 0, dlen = days.length; j < dlen; j++)
-                {
+                for (var j = 0, dlen = days.length; j < dlen; j++) {
                     $td = initElem($tr, 'td', days[j]);
                 }
 
@@ -1015,29 +1024,55 @@
                         }
                     }
                     var d = {
-                        m: m, y: y, d: ml};
+                        m: m, y: y, d: ml
+                    };
 
-                    var day = initElem(week, 'td', ml);
+                    var day = initElem(week, 'td', ml).removeClass('-work');
                     var count = getDays(d,
-                            { y:2015, m:8, d: 27
+                            {
+                                y: 2015, m: 8, d: 27
                             });
                     if (dateAssitant.compareDates2(ds, d) && dateAssitant.compareDates2(d, de)) {
-                        if (count > 0) {
-                            if (count % 4 == 0 || (count - 1) % 4 == 0) {
-                                day.addClass('-work');
-                                ds_s++;
+                        var check = false;
+                        if (cource) {
+                            for (var cc = 0, clen = cources.length; cc < clen; cc++) {
+                                if (dateAssitant.compareDates2(cources[cc][0], d) && dateAssitant.compareDates2(d, cources[cc][1])) {
+                                    check = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!check) {
+                            if (count > 0) {
+                                if (count % 4 == 0 || (count - 1) % 4 == 0) {
+                                    day.addClass('-work');
+                                    ds_s++;
+                                }
+                            }
+                            else {
+
+                                if (count % 4 == 0 || (count - 1) % 4 == 0) {
+                                    day.addClass('-work');
+                                    ds_s++;
+                                }
                             }
                         }
                         else {
-
-                            if (count % 4 == 0 || (count - 1) % 4 == 0) {
+                            if (~[1, 3, 6].indexOf(month[ml])) {
                                 day.addClass('-work');
                                 ds_s++;
                             }
+                            if (month[ml] == 5)
+                            {
+                                var wdays = dateAssitant.getThisWeekDays(d);
+                                day.addClass('-work');
+                                ds_s++;
+                            }
+
                         }
+
                     }
-                    else
-                    {
+                    else {
                         day.addClass('-none');
                     }
                     ml++;
