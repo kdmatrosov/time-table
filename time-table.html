@@ -529,6 +529,10 @@
                 return true;
             return false;
         };
+        DA.sameDates = function (date_less, date_more)
+        {
+            return date_less.d <= date_more.d && date_less.m == date_more.m && date_less.y == date_more.y;
+        };
         DA.getPreviousMonthDays = function() //returnFirstAndLastDays
         {
             var last = new Date(); // сегодня
@@ -1041,7 +1045,7 @@
     }
     table.month-table
     {
-        width: 400px;
+        width: 420px;
         text-align: center;
         border-collapse: collapse;
         border-top: 1px solid #363636;
